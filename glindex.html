@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Social Page</title>
+<style>
+  /* --- COLORS --- */
+  :root {
+    --dark-blue: #0b1e3f;
+    --gold: #ffd700;
+    --light-bg: #f4f4f4;
+  }
+
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: var(--light-bg);
+  }
+
+  header {
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.8em;
+    color: var(--gold);
+  }
+
+  nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: bold;
+  }
+
+  nav a:hover {
+    color: var(--gold);
+  }
+
+  main {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  /* --- SIDEBAR --- */
+  .sidebar {
+    width: 200px;
+    background-color: var(--dark-blue);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    height: fit-content;
+  }
+
+  .sidebar h2 {
+    color: var(--gold);
+  }
+
+  .members-list li {
+    margin-bottom: 8px;
+  }
+
+  /* --- FEED --- */
+  .feed {
+    flex: 1;
+  }
+
+  .post-form {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  }
+
+  .post-form input, .post-form textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .post-form button {
+    background-color: var(--gold);
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+
+  .post-form button:hover {
+    background-color: #e6c200;
+  }
+
+  .post {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  }
+
+  .post img {
+    max-width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+
+  .post-author {
+    font-weight: bold;
+    color: var(--dark-blue);
+  }
+
+  .comment-section {
+    margin-top: 10px;
+    font-size: 0.9em;
+  }
+
+  .comment-section input {
+    width: calc(100% - 70px);
+    padding: 5px;
+  }
+
+  .comment-section button {
+    padding: 5px 10px;
+    background-color: var(--dark-blue);
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+
+  .comment-section button:hover {
+    background-color: var(--gold);
+    color: black;
+  }
+
+  /* --- PROFILE PAGE --- */
+  .profile {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+  .profile img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+  }
+
+  .cover-photo {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 10px 10px 0 0;
+  }
+
+  /* --- FOOTER --- */
+  footer {
+    text-align: center;
+    padding: 10px;
+    background-color: var(--dark-blue);
+    color: white;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Grand Social</h1>
+  <nav>
+    <a href="#" onclick="showTab('feed')">Feed</a>
+    <a href="#" onclick="showTab('members')">Members</a>
+    <a href="#" onclick="showTab('profile')">Profile</a>
+  </nav>
+</header>
+
+<main>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Members</h2>
+    <ul class="members-list" id="membersList">
+      <!-- Members dynamically added -->
+    </ul>
+  </div>
+
+  <!-- Feed / Profile -->
+  <div class="feed" id="feedTab">
+    <div class="post-form">
+      <input type="text" id="postAuthor" placeholder="Your name">
+      <textarea id="postContent" rows="3" placeholder="What's on your mind?"></textarea>
+      <input type="text" id="postImage" placeholder="Image URL (optional)">
+      <button onclick="createPost()">Post</button>
+    </div>
+    <div id="postsContainer">
+      <!-- Posts will appear here -->
+    </div>
+  </div>
+
+  <div class="profile" id="profileTab" style="display:none;">
+    <img src="https://via.placeholder.com/600x150" class="cover-photo">
+    <img src="https://via.placeholder.com/100" alt="Profile Picture">
+    <h2 id="profileName">Your Name</h2>
+    <p>Member since: 2025</p>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Grand Social
+</footer>
+
+<script>
+  // --- DATA ---
+  let posts = [];
+  let members = ["Admin", "Alice", "Bob", "Charlie"];
+
+  // Add members to sidebar
+  const membersList = document.getElementById("membersList");
+  function renderMembers() {
+    membersList.innerHTML = "";
+    members.forEach(member => {
+      let li = document.createElement("li");
+      li.textContent = member;
+      membersList.appendChild(li);
+    });
+  }
+  renderMembers();
+
+  // Show tab function
+  function showTab(tab) {
+    document.getElementById("feedTab").style.display = "none";
+    document.getElementById("profileTab").style.display = "none";
+    if(tab === "feed") document.getElementById("feedTab").style.display = "block";
+    if(tab === "profile") document.getElementById("profileTab").style.display = "block";
+  }
+
+  // Create a post
+  function createPost() {
+    const author = document.getElementById("postAuthor").value || "Anonymous";
+    const content = document.getElementById("postContent").value;
+    const image = document.getElementById("postImage").value;
+
+    if(!content) { alert("Post content cannot be empty."); return; }
+
+    const post = { author, content, image, comments: [] };
+    posts.unshift(post);
+    renderPosts();
+
+    // Clear form
+    document.getElementById("postAuthor").value = "";
+    document.getElementById("postContent").value = "";
+    document.getElementById("postImage").value = "";
+  }
+
+  // Render posts
+  const postsContainer = document.getElementById("postsContainer");
+  function renderPosts() {
+    postsContainer.innerHTML = "";
+    posts.forEach((post, index) => {
+      const postDiv = document.createElement("div");
+      postDiv.className = "post";
+
+      postDiv.innerHTML = `
+        <div class="post-author">${post.author}</div>
+        <div class="post-content">${post.content}</div>
+        ${post.image ? `<img src="${post.image}" alt="Post Image">` : ""}
+        <div class="comment-section">
+          <input type="text" placeholder="Add a comment..." id="commentInput${index}">
+          <button onclick="addComment(${index})">Comment</button>
+          <div id="comments${index}"></div>
+        </div>
+      `;
+      postsContainer.appendChild(postDiv);
+
+      // Render comments
+      const commentsDiv = document.getElementById(`comments${index}`);
+      commentsDiv.innerHTML = post.comments.map(c => `<p><strong>${c.author}:</strong> ${c.text}</p>`).join("");
+    });
+  }
+
+  // Add comment
+  function addComment(index) {
+    const input = document.getElementById(`commentInput${index}`);
+    const text = input.value;
+    if(!text) return;
+    posts[index].comments.push({author: "Member", text});
+    renderPosts();
+  }
+</script>
+
+</body>
+</html>
